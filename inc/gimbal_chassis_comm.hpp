@@ -1,6 +1,6 @@
 /** 
  *******************************************************************************
- * @file      : gimbal_chassis_comm.hpp
+ * @file      :gimbal_chassis_comm.hpp
  * @brief     : 
  * @history   :
  *  Version     Date            Author          Note
@@ -118,22 +118,6 @@ class GimbalChassisComm : public hello_world::comm::Receiver, public hello_world
     } gp;
   };
 
-  struct ScopeData {
-    // chassis to gimbal
-    struct ChassisPart {
-      bool switch_flag = false;      ///< 倍镜切换信号标志位
-      bool ctrl_angle_flag = false;  ///< 控制倍镜俯仰角标志位
-
-      ScopeWorkingMode working_mode = ScopeWorkingMode::Normal;  ///< 倍镜模块的工作模式
-    } cp;
-    // gimbal to chassis
-    struct GimbalPart {
-      PwrState pwr_state = PwrState::Dead;  ///< 倍镜模块工作状态
-
-      float scope_ang = 0.0f;  ///< 倍镜的当前俯仰角度
-    } gp;
-  };
-
   struct RefereeData {
     // chassis to gimbal
     struct ChassisPart {
@@ -148,7 +132,7 @@ class GimbalChassisComm : public hello_world::comm::Receiver, public hello_world
     // gimbal to chassis
   };
 
-  struct VisoinData {
+  struct VisionData {
     // Gimbal to Chassis
     struct GimbalPart {
       uint8_t vtm_x = 0;
@@ -241,8 +225,7 @@ class GimbalChassisComm : public hello_world::comm::Receiver, public hello_world
   GimbalData& gimbal_data() { return gimbal_data_; }
   ShooterData& shooter_data() { return shooter_data_; }
   RefereeData& referee_data() { return referee_data_; }
-  VisoinData& vision_data() { return vision_data_; }
-  ScopeData& scope_data() { return scope_data_; }
+  VisionData& vision_data() { return vision_data_; }
 
   bool isOffline() { return oc_.isOffline(); }
   void setOfflineThreshold(uint32_t threshold) { oc_.set_offline_tick_thres(threshold); }
@@ -272,9 +255,8 @@ class GimbalChassisComm : public hello_world::comm::Receiver, public hello_world
   MainBoardData main_board_data_;
   GimbalData gimbal_data_;
   ShooterData shooter_data_;
-  ScopeData scope_data_;
   RefereeData referee_data_;
-  VisoinData vision_data_;
+  VisionData vision_data_;
 };
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/

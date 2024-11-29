@@ -69,11 +69,6 @@ enum class ShooterWorkingMode : uint8_t {
   FricBackward,  ///< 摩擦轮倒转模式
   Stop,          ///< 摩擦轮停转模式
 };
-/** 倍镜云台工作模式 */
-enum class ScopeWorkingMode : uint8_t {
-  Normal,    ///< 正常模式
-  Farshoot,  ///< 吊射模式
-};
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
@@ -131,11 +126,5 @@ inline std::string ShooterWorkingModeToStr(ShooterWorkingMode mode)
   return "ErrSWM";
 };
 
-inline std::string ScopeWorkingModeToStr(ScopeWorkingMode mode)
-{
-  if (mode == ScopeWorkingMode::Normal) return "Normal";
-  if (mode == ScopeWorkingMode::Farshoot) return "Farshoot";
-  return "ErrSGWM";
-}
 }  // namespace robot
 #endif /* MODULE_STATE_HPP_ */

@@ -34,10 +34,6 @@ struct __attribute__((packed)) C2GPkg1 {
   uint32_t shoot_flag : 1;
   uint32_t shooter_ctrl_mode : 1;
   uint32_t shooter_working_mode : 2;
-  // scope
-  uint32_t scope_switch_flag : 1;
-  uint32_t scope_ctrl_ang_flag : 1;
-  uint32_t scope_working_mode : 2;
 
   static void encode(GimbalChassisComm &gc_comm, uint8_t *tx_data);
 
@@ -92,9 +88,7 @@ struct __attribute__((packed)) G2CPkg2 {
   int8_t shooter_fric_spd_fdb;
   int8_t shooter_feed_ang_ref;
   int8_t shooter_feed_ang_fdb;
-  // scope
-  uint8_t scope_pwr_state : 2;
-  int8_t scope_ang;
+
   // shooter
 
   static void encode(GimbalChassisComm &gc_comm, uint8_t *tx_data);
@@ -197,10 +191,6 @@ void C2GPkg1::encode(GimbalChassisComm &gc_comm, uint8_t *tx_data)
   pkg_ptr->shoot_flag = gc_comm.shooter_data().cp.shoot_flag(true);
   pkg_ptr->shooter_ctrl_mode = (uint32_t)gc_comm.shooter_data().cp.ctrl_mode;
   pkg_ptr->shooter_working_mode = (uint32_t)gc_comm.shooter_data().cp.working_mode;
-  // scope
-  pkg_ptr->scope_switch_flag = gc_comm.scope_data().cp.switch_flag;
-  pkg_ptr->scope_ctrl_ang_flag = gc_comm.scope_data().cp.ctrl_angle_flag;
-  pkg_ptr->scope_working_mode = (uint32_t)gc_comm.scope_data().cp.working_mode;
 };
 
 void C2GPkg1::decode(GimbalChassisComm &gc_comm, const uint8_t *rx_data)
@@ -216,10 +206,6 @@ void C2GPkg1::decode(GimbalChassisComm &gc_comm, const uint8_t *rx_data)
   gc_comm.shooter_data().cp.setShootFlag(pkg_ptr->shoot_flag);
   gc_comm.shooter_data().cp.ctrl_mode = (CtrlMode)pkg_ptr->shooter_ctrl_mode;
   gc_comm.shooter_data().cp.working_mode = (ShooterWorkingMode)pkg_ptr->shooter_working_mode;
-  // scope
-  gc_comm.scope_data().cp.switch_flag = pkg_ptr->scope_switch_flag;
-  gc_comm.scope_data().cp.ctrl_angle_flag = pkg_ptr->scope_ctrl_ang_flag;
-  gc_comm.scope_data().cp.working_mode = (ScopeWorkingMode)pkg_ptr->scope_working_mode;
 };
 
 void C2GPkg2::encode(GimbalChassisComm &gc_comm, uint8_t *tx_data)
@@ -292,9 +278,6 @@ void G2CPkg2::encode(GimbalChassisComm &gc_comm, uint8_t *tx_data)
   pkg_ptr->shooter_fric_spd_fdb = gc_comm.shooter_data().gp.fric_spd_fdb * 127.0f / 840.0f;
   pkg_ptr->shooter_feed_ang_ref = gc_comm.shooter_data().gp.feed_ang_ref * 127.0f / M_PI;
   pkg_ptr->shooter_feed_ang_fdb = gc_comm.shooter_data().gp.feed_ang_fdb * 127.0f / M_PI;
-  // scope
-  pkg_ptr->scope_pwr_state = (uint8_t)gc_comm.scope_data().gp.pwr_state;
-  pkg_ptr->scope_ang = gc_comm.scope_data().gp.scope_ang * 127.0f / M_PI;
 };
 
 void G2CPkg2::decode(GimbalChassisComm &gc_comm, const uint8_t *rx_data)
@@ -307,9 +290,6 @@ void G2CPkg2::decode(GimbalChassisComm &gc_comm, const uint8_t *rx_data)
   gc_comm.shooter_data().gp.fric_spd_fdb = pkg_ptr->shooter_fric_spd_fdb * 840.0f / 127.0f;
   gc_comm.shooter_data().gp.feed_ang_ref = pkg_ptr->shooter_feed_ang_ref * M_PI / 127.0f;
   gc_comm.shooter_data().gp.feed_ang_fdb = pkg_ptr->shooter_feed_ang_fdb * M_PI / 127.0f;
-  // scope
-  gc_comm.scope_data().gp.pwr_state = (PwrState)pkg_ptr->scope_pwr_state;
-  gc_comm.scope_data().gp.scope_ang = pkg_ptr->scope_ang * M_PI / 127.0f;
 };
 
 }  // namespace robot
