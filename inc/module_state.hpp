@@ -54,13 +54,11 @@ enum class ChassisWorkingMode : uint8_t {
   Depart,    ///< 分离模式
   Follow,    ///< 随动模式
   Gyro,      ///< 小陀螺模式
-  Farshoot,  ///< 吊射模式
 };
 
 /** 云台工作模式 */
 enum class GimbalWorkingMode {
   Normal,    ///< 正常模式
-  Farshoot,  ///< 吊射模式
 };
 /** 发射机构工作模式 */
 enum class ShooterWorkingMode : uint8_t {
@@ -107,14 +105,12 @@ inline std::string ChassisWorkingModeToStr(ChassisWorkingMode mode)
   if (mode == ChassisWorkingMode::Depart) return "Depart";
   if (mode == ChassisWorkingMode::Follow) return "Follow";
   if (mode == ChassisWorkingMode::Gyro) return "Gyro";
-  if (mode == ChassisWorkingMode::Farshoot) return "Farshoot";
   return "ErrCWM";
 };
 
 inline std::string GimbalWorkingModeToStr(GimbalWorkingMode mode)
 {
   if (mode == GimbalWorkingMode::Normal) return "Normal";
-  if (mode == GimbalWorkingMode::Farshoot) return "Farshoot";
   return "ErrGWM";
 };
 
