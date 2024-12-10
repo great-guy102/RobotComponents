@@ -1,6 +1,6 @@
 /** 
  *******************************************************************************
- * @file      : module_state.hpp
+ * @file      :module_state.hpp
  * @brief     : 
  * @history   :
  *  Version     Date            Author          Note
@@ -59,6 +59,8 @@ enum class ChassisWorkingMode : uint8_t {
 /** 云台工作模式 */
 enum class GimbalWorkingMode {
   Normal,    ///< 正常模式
+  YawPid,    ///< Yaw轴PID调试模式
+  PitchPid,  ///< Pitch轴PID调试模式   
 };
 /** 发射机构工作模式 */
 enum class ShooterWorkingMode : uint8_t {
