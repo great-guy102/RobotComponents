@@ -148,10 +148,14 @@ public:
     code_part_ = code_part;
     if (code_part_ == CodePart::Chassis) {
       tx_id_ = chassis_id;
+      tx_ids_ = {tx_id_};
       rx_id_ = gimbal_id;
+      rx_ids_ = {rx_id_};
     } else if (code_part_ == CodePart::Gimbal) {
       tx_id_ = gimbal_id;
+      tx_ids_ = {tx_id_};
       rx_id_ = chassis_id;
+      rx_ids_ = {rx_id_};
     } else {
       HW_ASSERT(false, "Invalid code part", __FILE__);
     }
@@ -165,7 +169,8 @@ public:
    * @note        None
    */
   virtual uint32_t rxId(void) const override { return rx_id_; };
-  virtual const RxIds &rxIds(void) const override { ; };
+  virtual const RxIds &rxIds(void) const override { return rx_ids_; };
+
   /**
    * @brief       解码
    * @param        data: 数据指针
@@ -205,7 +210,8 @@ public:
    * @note        None
    */
   virtual uint32_t txId(void) const override { return tx_id_; };
-  virtual const TxIds &txIds(void) const override { ; };
+  virtual const TxIds &txIds(void) const override { return tx_ids_; };
+
   /**
    * @brief       编码
    * @param        len: 缓冲区长度
@@ -256,6 +262,8 @@ private:
   // 编码相关
   uint32_t tx_id_ = 0x111;            ///< 发送的CAN消息ID
   uint32_t transmit_success_cnt_ = 0; ///< 发送成功次数
+  RxIds rx_ids_ = {rx_id_};           ///< 接收器ID列表
+  TxIds tx_ids_ = {tx_id_};           ///< 发送器ID列表
 
   // 所有数据
   MainBoardData main_board_data_;
