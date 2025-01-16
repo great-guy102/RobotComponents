@@ -125,6 +125,7 @@ public:
     struct ChassisPart {
       bool is_rfr_gimbal_power_on = false;
       bool is_rfr_shooter_power_on = false;
+      bool is_new_bullet_shot = false;
       RobotId robot_id = RobotId::kRedStandard3;
       float bullet_speed = 0;
       float shooter_heat = 0;
