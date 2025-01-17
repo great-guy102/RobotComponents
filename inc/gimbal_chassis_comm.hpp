@@ -20,11 +20,16 @@
 #include <cstdint>
 
 #include "base.hpp"
-#include "module_state.hpp"
 #include "offline_checker.hpp"
+
 #include "receiver.hpp"
 #include "rfr_official_pkgs.hpp"
 #include "transmitter.hpp"
+
+#include "fric_2motor.hpp"
+#include "module_fsm.hpp"
+
+#include "module_state.hpp"
 /* Exported macro ------------------------------------------------------------*/
 namespace robot {
 /* Exported constants --------------------------------------------------------*/
@@ -36,6 +41,9 @@ public:
   typedef hello_world::referee::ids::RobotId RobotId;
   typedef hello_world::referee::ids::TeamColor TeamColor;
   typedef hello_world::OfflineChecker OfflineChecker;
+  typedef hello_world::module::PwrState PwrState;
+  typedef hello_world::module::CtrlMode CtrlMode;
+  typedef hello_world::module::Fric::WorkingMode ShooterWorkingMode;
 
   enum class CodePart : uint8_t {
     Chassis = 0,
@@ -61,8 +69,8 @@ public:
       float yaw_delta = 0; ///< 将归一化的角度增量值转换到-127~127
       float pitch_delta = 0; ///< 将归一化的角度增量值转换到-127~127
 
-      CtrlMode ctrl_mode = CtrlMode::Manual; ///< 云台模块控制模式（工作状态为
-                                             ///< kPwrStateWorking 时有效）
+      CtrlMode ctrl_mode = CtrlMode::kManual; ///< 云台模块控制模式（工作状态为
+                                              ///< kPwrStateWorking 时有效）
 
       GimbalWorkingMode working_mode =
           GimbalWorkingMode::Normal; ///< 云台模块的工作模式（工作状态为
@@ -71,7 +79,7 @@ public:
 
     // gimbal to chassis
     struct GimbalPart {
-      PwrState pwr_state = PwrState::Dead; ///< 云台模块工作状态
+      PwrState pwr_state = PwrState::kDead; ///< 云台模块工作状态
 
       float yaw_fdb = 0.0f;   ///< 云台的当前偏航角度(关节空间)
       float pitch_fdb = 0.0f; ///< 云台的当前俯仰角度(关节空间)
@@ -97,10 +105,10 @@ public:
         return res;
       }
 
-      CtrlMode ctrl_mode = CtrlMode::Manual; ///< 发射机构模块控制模式
+      CtrlMode ctrl_mode = CtrlMode::kManual; ///< 发射机构模块控制模式
 
       ShooterWorkingMode working_mode =
-          ShooterWorkingMode::Normal; ///< 发射机构模块的工作模式
+          ShooterWorkingMode::kShoot; ///< 发射机构模块的工作模式
 
     private:
       uint8_t shoot_count_ = 0; ///< 射击次数，用于判断是否发送射击指令
@@ -112,11 +120,11 @@ public:
       bool is_fric_stuck_ = false;  ///< 摩擦轮是否卡住
       uint8_t feed_stuck_state = 0; ///< 拨盘卡住状态
 
-      PwrState pwr_state = PwrState::Dead; ///< 发射机构模块工作状态
-      float fric_spd_ref = 0;              ///< 摩擦轮转速期望值
-      float fric_spd_fdb = 0.0f;           ///< 摩擦轮的转速反馈值
-      float feed_ang_ref = 0;              ///< 拨盘角度期望值
-      float feed_ang_fdb = 0.0f;           ///< 拨盘角度反馈值
+      PwrState pwr_state = PwrState::kDead; ///< 发射机构模块工作状态
+      float fric_spd_ref = 0;               ///< 摩擦轮转速期望值
+      float fric_spd_fdb = 0.0f;            ///< 摩擦轮的转速反馈值
+      float feed_ang_ref = 0;               ///< 拨盘角度期望值
+      float feed_ang_fdb = 0.0f;            ///< 拨盘角度反馈值
     } gp;
   };
 
@@ -255,13 +263,13 @@ private:
   size_t g2c_seq_ = 0;
 
   // 解码相关
-  uint32_t rx_id_ = 0x112;                  ///< 接收的CAN消息ID
+  uint32_t rx_id_ = 0x04;                   ///< 接收的CAN消息ID
   bool is_update_ = false;                  ///< 是否有更新数据
   pUpdateCallback update_cb_ = nullptr;     ///< 更新回调函数
   OfflineChecker oc_ = OfflineChecker(100); ///< 离线检测器
 
   // 编码相关
-  uint32_t tx_id_ = 0x111;            ///< 发送的CAN消息ID
+  uint32_t tx_id_ = 0x03;             ///< 发送的CAN消息ID
   uint32_t transmit_success_cnt_ = 0; ///< 发送成功次数
   RxIds rx_ids_ = {rx_id_};           ///< 接收器ID列表
   TxIds tx_ids_ = {tx_id_};           ///< 发送器ID列表
