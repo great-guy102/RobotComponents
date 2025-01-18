@@ -43,14 +43,12 @@ static_assert(sizeof(C2GPkg1) <= 8, "C2GPkg1 size error");
 struct __attribute__((packed)) C2GPkg2 {
   uint8_t pkg_type;
   // rfr
-  uint8_t rfr_robot_id;
   uint8_t rfr_heat_limit; ///< 热量限制 [0, 650] 都可以被 10 整除
   uint8_t rfr_st_cooling; ///< 发射机构的冷却速率 [0, 120] 需要精确到个位
+  uint16_t rfr_robot_id;     ///< 机器人 ID
   uint16_t rfr_blt_spd : 12; ///< 弹丸速度的理论范围 [0, 40.0m/s]
                              ///< 需要精确到小数点后 2 位
   uint16_t rfr_st_heat : 10; ///< 发射机构的热量 [0, 650] 需要精确到个位
-  uint16_t rfr_is_rfr_gimbal_power_on : 1;
-  uint16_t rfr_is_rfr_shooter_power_on : 1;
   uint16_t rfr_is_new_bullet_shot : 1;
 
   static void encode(GimbalChassisComm &gc_comm, uint8_t *tx_data);
@@ -213,7 +211,7 @@ void C2GPkg1::decode(GimbalChassisComm &gc_comm, const uint8_t *rx_data) {
 void C2GPkg2::encode(GimbalChassisComm &gc_comm, uint8_t *tx_data) {
   C2GPkg2 *pkg_ptr = (C2GPkg2 *)tx_data;
   // rfr
-  pkg_ptr->rfr_robot_id = (uint8_t)gc_comm.referee_data().cp.robot_id;
+  pkg_ptr->rfr_robot_id = (uint16_t)gc_comm.referee_data().cp.robot_id;
   pkg_ptr->rfr_heat_limit = gc_comm.referee_data().cp.shooter_heat_limit / 10;
   pkg_ptr->rfr_st_cooling = gc_comm.referee_data().cp.shooter_cooling;
   pkg_ptr->rfr_blt_spd =
@@ -221,10 +219,6 @@ void C2GPkg2::encode(GimbalChassisComm &gc_comm, uint8_t *tx_data) {
                                     0.0f, 40.0f) *
                  100);
   pkg_ptr->rfr_st_heat = gc_comm.referee_data().cp.shooter_heat;
-  pkg_ptr->rfr_is_rfr_gimbal_power_on =
-      gc_comm.referee_data().cp.is_rfr_gimbal_power_on;
-  pkg_ptr->rfr_is_rfr_shooter_power_on =
-      gc_comm.referee_data().cp.is_rfr_shooter_power_on;
   pkg_ptr->rfr_is_new_bullet_shot =
       gc_comm.referee_data().cp.is_new_bullet_shot;
 };
@@ -238,10 +232,6 @@ void C2GPkg2::decode(GimbalChassisComm &gc_comm, const uint8_t *rx_data) {
   gc_comm.referee_data().cp.shooter_cooling = pkg_ptr->rfr_st_cooling;
   gc_comm.referee_data().cp.bullet_speed = pkg_ptr->rfr_blt_spd / 100.0;
   gc_comm.referee_data().cp.shooter_heat = pkg_ptr->rfr_st_heat;
-  gc_comm.referee_data().cp.is_rfr_gimbal_power_on =
-      pkg_ptr->rfr_is_rfr_gimbal_power_on;
-  gc_comm.referee_data().cp.is_rfr_shooter_power_on =
-      pkg_ptr->rfr_is_rfr_shooter_power_on;
   gc_comm.referee_data().cp.is_new_bullet_shot =
       pkg_ptr->rfr_is_new_bullet_shot;
 };

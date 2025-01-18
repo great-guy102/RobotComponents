@@ -38,7 +38,7 @@ namespace robot {
 class GimbalChassisComm : public hello_world::comm::Receiver,
                           public hello_world::comm::Transmitter {
 public:
-  typedef hello_world::referee::ids::RobotId RobotId;
+  typedef hello_world::referee::RfrId RobotId;
   typedef hello_world::referee::ids::TeamColor TeamColor;
   typedef hello_world::OfflineChecker OfflineChecker;
   typedef hello_world::module::PwrState PwrState;
@@ -131,10 +131,8 @@ public:
   struct RefereeData {
     // chassis to gimbal
     struct ChassisPart {
-      bool is_rfr_gimbal_power_on = false;
-      bool is_rfr_shooter_power_on = false;
       bool is_new_bullet_shot = false;
-      RobotId robot_id = RobotId::kRedStandard3;
+      RobotId robot_id = 3;
       float bullet_speed = 0;
       float shooter_heat = 0;
       float shooter_cooling = 0;
