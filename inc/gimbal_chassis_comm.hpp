@@ -146,6 +146,7 @@ public:
     struct GimbalPart {
       uint8_t vtm_x = 0;
       uint8_t vtm_y = 0;
+      bool is_enemy_detected = false;
     } gp;
   };
 

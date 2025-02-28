@@ -47,31 +47,6 @@ typedef hello_world::module::Fric::WorkingMode ShooterWorkingMode;
 
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
-inline std::string ChassisWorkingModeToStr(ChassisWorkingMode mode) {
-  if (mode == ChassisWorkingMode::Depart)
-    return "Depart";
-  if (mode == ChassisWorkingMode::Follow)
-    return "Follow";
-  if (mode == ChassisWorkingMode::Gyro)
-    return "Gyro";
-  return "ErrCWM";
-};
-
-inline std::string GimbalWorkingModeToStr(GimbalWorkingMode mode) {
-  if (mode == GimbalWorkingMode::Normal)
-    return "Normal";
-  return "ErrGWM";
-};
-
-inline std::string ShooterWorkingModeToStr(ShooterWorkingMode mode) {
-  if (mode == ShooterWorkingMode::kShoot)
-    return "Shoot";
-  if (mode == ShooterWorkingMode::kStop)
-    return "Stop";
-  if (mode == ShooterWorkingMode::kBackward)
-    return "Backward";
-  return "ErrSWM";
-};
 
 } // namespace robot
 #endif /* MODULE_STATE_HPP_ */
