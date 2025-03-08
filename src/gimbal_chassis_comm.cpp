@@ -49,7 +49,7 @@ struct __attribute__((packed)) C2GPkg2 {
   uint16_t rfr_blt_spd : 12; ///< 弹丸速度的理论范围 [0, 40.0m/s]
                              ///< 需要精确到小数点后 2 位
   uint16_t rfr_st_heat : 10; ///< 发射机构的热量 [0, 650] 需要精确到个位
-  uint16_t rfr_is_new_bullet_shot : 1;
+  uint16_t rfr_bullet_shot_cnt : 2; ///< 是否发射了新的弹丸
 
   static void encode(GimbalChassisComm &gc_comm, uint8_t *tx_data);
 
@@ -219,8 +219,8 @@ void C2GPkg2::encode(GimbalChassisComm &gc_comm, uint8_t *tx_data) {
                                     0.0f, 40.0f) *
                  100);
   pkg_ptr->rfr_st_heat = gc_comm.referee_data().cp.shooter_heat;
-  pkg_ptr->rfr_is_new_bullet_shot =
-      gc_comm.referee_data().cp.is_new_bullet_shot;
+  pkg_ptr->rfr_bullet_shot_cnt =
+      gc_comm.referee_data().cp.rfr_bullet_shot_cnt;
 };
 
 void C2GPkg2::decode(GimbalChassisComm &gc_comm, const uint8_t *rx_data) {
@@ -232,8 +232,8 @@ void C2GPkg2::decode(GimbalChassisComm &gc_comm, const uint8_t *rx_data) {
   gc_comm.referee_data().cp.shooter_cooling = pkg_ptr->rfr_st_cooling;
   gc_comm.referee_data().cp.bullet_speed = pkg_ptr->rfr_blt_spd / 100.0;
   gc_comm.referee_data().cp.shooter_heat = pkg_ptr->rfr_st_heat;
-  gc_comm.referee_data().cp.is_new_bullet_shot =
-      pkg_ptr->rfr_is_new_bullet_shot;
+  gc_comm.referee_data().cp.rfr_bullet_shot_cnt =
+      pkg_ptr->rfr_bullet_shot_cnt;
 };
 
 void G2CPkg1::encode(GimbalChassisComm &gc_comm, uint8_t *tx_data) {

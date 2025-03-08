@@ -131,7 +131,7 @@ public:
   struct RefereeData {
     // chassis to gimbal
     struct ChassisPart {
-      bool is_new_bullet_shot = false;
+      uint8_t rfr_bullet_shot_cnt = 0;
       RobotId robot_id = 3;
       float bullet_speed = 0;
       float shooter_heat = 0;
