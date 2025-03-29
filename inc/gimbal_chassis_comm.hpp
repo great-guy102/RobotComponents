@@ -64,9 +64,9 @@ public:
   struct GimbalData {
     // chassis to gimbal
     struct ChassisPart {
-      bool turn_back_flag = false; ///< 云台快速后转 180 标志
+      uint8_t rev_gimbal_cnt = 0; ///< 云台掉头标志计数器
 
-      float yaw_delta = 0; ///< 将归一化的角度增量值转换到-127~127
+      float yaw_delta = 0;   ///< 将归一化的角度增量值转换到-127~127
       float pitch_delta = 0; ///< 将归一化的角度增量值转换到-127~127
 
       CtrlMode ctrl_mode = CtrlMode::kManual; ///< 云台模块控制模式（工作状态为
@@ -131,6 +131,9 @@ public:
   struct RefereeData {
     // chassis to gimbal
     struct ChassisPart {
+      bool is_rfr_on = false;
+      bool is_rfr_gimbal_power_on = false;
+      bool is_rfr_shooter_power_on = false;
       uint8_t rfr_bullet_shot_cnt = 0;
       RobotId robot_id = 3;
       float bullet_speed = 0;
@@ -156,17 +159,15 @@ public:
     code_part_ = code_part;
     if (code_part_ == CodePart::Chassis) {
       tx_id_ = chassis_id;
-      tx_ids_ = {tx_id_};
       rx_id_ = gimbal_id;
-      rx_ids_ = {rx_id_};
     } else if (code_part_ == CodePart::Gimbal) {
       tx_id_ = gimbal_id;
-      tx_ids_ = {tx_id_};
       rx_id_ = chassis_id;
-      rx_ids_ = {rx_id_};
     } else {
       HW_ASSERT(false, "Invalid code part", __FILE__);
     }
+    tx_ids_ = {tx_id_};
+    rx_ids_ = {rx_id_};
   };
   virtual ~GimbalChassisComm() = default;
 

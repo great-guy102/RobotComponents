@@ -38,6 +38,7 @@ enum class ChassisWorkingMode : uint8_t {
 enum class GimbalWorkingMode {
   Normal,  ///< 正常模式
   PidTest, ///< PID 调试模式
+  Sentry,  ///< 哨兵模式
 };
 
 /* Exported types ------------------------------------------------------------*/
