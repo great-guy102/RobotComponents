@@ -117,7 +117,7 @@ public:
     } cp;
     // gimbal to chassis
     struct GimbalPart {
-      bool is_fric_stuck_ = false;  ///< 摩擦轮是否卡住
+      bool is_shooter_stuck = false;  ///< 摩擦轮是否卡住
       uint8_t feed_stuck_state = 0; ///< 拨盘卡住状态
 
       PwrState pwr_state = PwrState::kDead; ///< 发射机构模块工作状态

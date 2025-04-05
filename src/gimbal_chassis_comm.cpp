@@ -84,7 +84,8 @@ static_assert(sizeof(G2CPkg1) <= 8, "Gimbal2ChassisPkg size error");
 struct __attribute__((packed)) G2CPkg2 {
   uint8_t pkg_type;
   // shooter
-  uint8_t shooter_is_fric_stuck : 1;
+  uint8_t gimbal_pwr_state : 2;
+  uint8_t shooter_is_shooter_stuck : 1;
   uint8_t shooter_feed_stuck_state : 2;
   int8_t shooter_fric_spd_ref;
   int8_t shooter_fric_spd_fdb;
@@ -264,6 +265,8 @@ void G2CPkg1::encode(GimbalChassisComm &gc_comm, uint8_t *tx_data) {
   // vision
   pkg_ptr->vision_vtm_x = gc_comm.vision_data().gp.vtm_x;
   pkg_ptr->vision_vtm_y = gc_comm.vision_data().gp.vtm_y;
+  pkg_ptr->vision_is_enemy_detected =
+      gc_comm.vision_data().gp.is_enemy_detected;
 };
 
 void G2CPkg1::decode(GimbalChassisComm &gc_comm, const uint8_t *rx_data) {
@@ -290,7 +293,8 @@ void G2CPkg1::decode(GimbalChassisComm &gc_comm, const uint8_t *rx_data) {
 void G2CPkg2::encode(GimbalChassisComm &gc_comm, uint8_t *tx_data) {
   G2CPkg2 *pkg_ptr = (G2CPkg2 *)tx_data;
   // shooter
-  pkg_ptr->shooter_is_fric_stuck = gc_comm.shooter_data().gp.is_fric_stuck_;
+  pkg_ptr->gimbal_pwr_state = (uint8_t)gc_comm.shooter_data().gp.pwr_state;
+  pkg_ptr->shooter_is_shooter_stuck = gc_comm.shooter_data().gp.is_shooter_stuck;
   pkg_ptr->shooter_feed_stuck_state =
       gc_comm.shooter_data().gp.feed_stuck_state;
   pkg_ptr->shooter_fric_spd_ref =
@@ -306,7 +310,8 @@ void G2CPkg2::encode(GimbalChassisComm &gc_comm, uint8_t *tx_data) {
 void G2CPkg2::decode(GimbalChassisComm &gc_comm, const uint8_t *rx_data) {
   G2CPkg2 *pkg_ptr = (G2CPkg2 *)rx_data;
   // shooter
-  gc_comm.shooter_data().gp.is_fric_stuck_ = pkg_ptr->shooter_is_fric_stuck;
+  gc_comm.shooter_data().gp.pwr_state = (PwrState)pkg_ptr->gimbal_pwr_state;
+  gc_comm.shooter_data().gp.is_shooter_stuck = pkg_ptr->shooter_is_shooter_stuck;
   gc_comm.shooter_data().gp.feed_stuck_state =
       pkg_ptr->shooter_feed_stuck_state;
   gc_comm.shooter_data().gp.fric_spd_ref =
