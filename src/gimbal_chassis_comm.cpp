@@ -62,16 +62,18 @@ static_assert(sizeof(C2GPkg2) <= 8, "C2GPkg2 size error");
 struct __attribute__((packed)) G2CPkg1 {
   uint8_t pkg_type;
   // robot
-  uint8_t gimbal_board_is_imu_ready : 1;
+  uint8_t gimbal_is_imu_ready : 1;
   // gimbal
   uint8_t gimbal_pwr_state : 2;
-  uint8_t vision_is_enemy_detected : 1;
+  uint8_t gimbal_is_motors_online : 1;
   int8_t gimbal_pitch_ref; ///< [-PI, PI]
   int8_t gimbal_pitch_fdb; ///< [-PI, PI]
   // int8_t gimbal_yaw_ref;   ///< [-PI, PI]
   // int8_t gimbal_yaw_fdb;   ///< [-PI, PI]
 
   // vision
+  uint8_t vision_is_online : 1;
+  uint8_t vision_is_enemy_detected : 1;
   uint8_t vision_vtm_x;
   uint8_t vision_vtm_y;
 
@@ -84,15 +86,14 @@ static_assert(sizeof(G2CPkg1) <= 8, "Gimbal2ChassisPkg size error");
 struct __attribute__((packed)) G2CPkg2 {
   uint8_t pkg_type;
   // shooter
-  uint8_t gimbal_pwr_state : 2;
-  uint8_t shooter_is_shooter_stuck : 1;
+  uint8_t shooter_pwr_state : 2;
+  uint8_t shooter_is_motors_online : 1;
+  uint8_t shooter_is_stuck : 1;
   uint8_t shooter_feed_stuck_state : 2;
   int8_t shooter_fric_spd_ref;
   int8_t shooter_fric_spd_fdb;
   int8_t shooter_feed_ang_ref;
   int8_t shooter_feed_ang_fdb;
-
-  // shooter
 
   static void encode(GimbalChassisComm &gc_comm, uint8_t *tx_data);
 
@@ -251,10 +252,14 @@ void C2GPkg2::decode(GimbalChassisComm &gc_comm, const uint8_t *rx_data) {
 void G2CPkg1::encode(GimbalChassisComm &gc_comm, uint8_t *tx_data) {
   G2CPkg1 *pkg_ptr = (G2CPkg1 *)tx_data;
   // robot
-  pkg_ptr->gimbal_board_is_imu_ready =
+  pkg_ptr->gimbal_is_imu_ready =
       gc_comm.main_board_data().gp.is_gimbal_imu_ready;
+
   // gimbal
   pkg_ptr->gimbal_pwr_state = (uint8_t)gc_comm.gimbal_data().gp.pwr_state;
+  pkg_ptr->gimbal_is_motors_online =
+      gc_comm.gimbal_data().gp.is_gimbal_motors_online;
+
   // 都是周期数据，溢出不影响取值
   pkg_ptr->gimbal_pitch_ref =
       gc_comm.gimbal_data().gp.pitch_ref * 127.0f / M_PI;
@@ -262,20 +267,25 @@ void G2CPkg1::encode(GimbalChassisComm &gc_comm, uint8_t *tx_data) {
       gc_comm.gimbal_data().gp.pitch_fdb * 127.0f / M_PI;
   // pkg_ptr->gimbal_yaw_ref = gc_comm.gimbal_data().gp.yaw_ref * 127.0f / M_PI;
   // pkg_ptr->gimbal_yaw_fdb = gc_comm.gimbal_data().gp.yaw_fdb * 127.0f / M_PI;
+
   // vision
-  pkg_ptr->vision_vtm_x = gc_comm.vision_data().gp.vtm_x;
-  pkg_ptr->vision_vtm_y = gc_comm.vision_data().gp.vtm_y;
+  pkg_ptr->vision_is_online = gc_comm.vision_data().gp.is_vision_online;
   pkg_ptr->vision_is_enemy_detected =
       gc_comm.vision_data().gp.is_enemy_detected;
+  pkg_ptr->vision_vtm_x = gc_comm.vision_data().gp.vtm_x;
+  pkg_ptr->vision_vtm_y = gc_comm.vision_data().gp.vtm_y;
 };
 
 void G2CPkg1::decode(GimbalChassisComm &gc_comm, const uint8_t *rx_data) {
   G2CPkg1 *pkg_ptr = (G2CPkg1 *)rx_data;
   // robot
   gc_comm.main_board_data().gp.is_gimbal_imu_ready =
-      pkg_ptr->gimbal_board_is_imu_ready;
+      pkg_ptr->gimbal_is_imu_ready;
+
   // gimbal
   gc_comm.gimbal_data().gp.pwr_state = (PwrState)pkg_ptr->gimbal_pwr_state;
+  gc_comm.gimbal_data().gp.is_gimbal_motors_online =
+      pkg_ptr->gimbal_is_motors_online;
   // 都是周期数据，溢出不影响取值
   gc_comm.gimbal_data().gp.pitch_ref =
       pkg_ptr->gimbal_pitch_ref * M_PI / 127.0f;
@@ -283,18 +293,22 @@ void G2CPkg1::decode(GimbalChassisComm &gc_comm, const uint8_t *rx_data) {
       pkg_ptr->gimbal_pitch_fdb * M_PI / 127.0f;
   // gc_comm.gimbal_data().gp.yaw_ref = pkg_ptr->gimbal_yaw_ref * M_PI / 127.0f;
   // gc_comm.gimbal_data().gp.yaw_fdb = pkg_ptr->gimbal_yaw_fdb * M_PI / 127.0f;
+
   // vision
-  gc_comm.vision_data().gp.vtm_x = pkg_ptr->vision_vtm_x;
-  gc_comm.vision_data().gp.vtm_y = pkg_ptr->vision_vtm_y;
+  gc_comm.vision_data().gp.is_vision_online = pkg_ptr->vision_is_online;
   gc_comm.vision_data().gp.is_enemy_detected =
       pkg_ptr->vision_is_enemy_detected;
+  gc_comm.vision_data().gp.vtm_x = pkg_ptr->vision_vtm_x;
+  gc_comm.vision_data().gp.vtm_y = pkg_ptr->vision_vtm_y;
 };
 
 void G2CPkg2::encode(GimbalChassisComm &gc_comm, uint8_t *tx_data) {
   G2CPkg2 *pkg_ptr = (G2CPkg2 *)tx_data;
   // shooter
-  pkg_ptr->gimbal_pwr_state = (uint8_t)gc_comm.shooter_data().gp.pwr_state;
-  pkg_ptr->shooter_is_shooter_stuck = gc_comm.shooter_data().gp.is_shooter_stuck;
+  pkg_ptr->shooter_pwr_state = (uint8_t)gc_comm.shooter_data().gp.pwr_state;
+  pkg_ptr->shooter_is_motors_online =
+      gc_comm.shooter_data().gp.is_shooter_motors_online;
+  pkg_ptr->shooter_is_stuck = gc_comm.shooter_data().gp.is_shooter_stuck;
   pkg_ptr->shooter_feed_stuck_state =
       gc_comm.shooter_data().gp.feed_stuck_state;
   pkg_ptr->shooter_fric_spd_ref =
@@ -310,8 +324,10 @@ void G2CPkg2::encode(GimbalChassisComm &gc_comm, uint8_t *tx_data) {
 void G2CPkg2::decode(GimbalChassisComm &gc_comm, const uint8_t *rx_data) {
   G2CPkg2 *pkg_ptr = (G2CPkg2 *)rx_data;
   // shooter
-  gc_comm.shooter_data().gp.pwr_state = (PwrState)pkg_ptr->gimbal_pwr_state;
-  gc_comm.shooter_data().gp.is_shooter_stuck = pkg_ptr->shooter_is_shooter_stuck;
+  gc_comm.shooter_data().gp.pwr_state = (PwrState)pkg_ptr->shooter_pwr_state;
+  gc_comm.shooter_data().gp.is_shooter_motors_online =
+      pkg_ptr->shooter_is_motors_online;
+  gc_comm.shooter_data().gp.is_shooter_stuck = pkg_ptr->shooter_is_stuck;
   gc_comm.shooter_data().gp.feed_stuck_state =
       pkg_ptr->shooter_feed_stuck_state;
   gc_comm.shooter_data().gp.fric_spd_ref =

@@ -80,6 +80,7 @@ public:
     // gimbal to chassis
     struct GimbalPart {
       PwrState pwr_state = PwrState::kDead; ///< 云台模块工作状态
+      bool is_gimbal_motors_online = false; ///< 云台关节电机是否在线
 
       float yaw_fdb = 0.0f;   ///< 云台的当前偏航角度(关节空间)
       float pitch_fdb = 0.0f; ///< 云台的当前俯仰角度(关节空间)
@@ -117,8 +118,9 @@ public:
     } cp;
     // gimbal to chassis
     struct GimbalPart {
-      bool is_shooter_stuck = false;  ///< 摩擦轮是否卡住
-      uint8_t feed_stuck_state = 0; ///< 拨盘卡住状态
+      bool is_shooter_stuck = false;         ///< 摩擦轮是否卡住
+      bool is_shooter_motors_online = false; ///< 摩擦轮电机是否在线
+      uint8_t feed_stuck_state = 0;          ///< 拨盘卡住状态
 
       PwrState pwr_state = PwrState::kDead; ///< 发射机构模块工作状态
       float fric_spd_ref = 0;               ///< 摩擦轮转速期望值
@@ -147,9 +149,11 @@ public:
   struct VisionData {
     // Gimbal to Chassis
     struct GimbalPart {
+      bool is_vision_online = false; ///< 视觉模块是否在线
+      bool is_enemy_detected = false;
+      
       uint8_t vtm_x = 0;
       uint8_t vtm_y = 0;
-      bool is_enemy_detected = false;
     } gp;
   };
 
