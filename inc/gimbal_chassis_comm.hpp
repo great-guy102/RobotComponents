@@ -151,7 +151,7 @@ public:
     struct GimbalPart {
       bool is_vision_online = false; ///< 视觉模块是否在线
       bool is_enemy_detected = false;
-      
+
       uint8_t vtm_x = 0;
       uint8_t vtm_y = 0;
     } gp;
@@ -170,7 +170,6 @@ public:
     } else {
       HW_ASSERT(false, "Invalid code part", __FILE__);
     }
-    tx_ids_ = {tx_id_};
     rx_ids_ = {rx_id_};
   };
   virtual ~GimbalChassisComm() = default;
@@ -191,7 +190,7 @@ public:
    * @retval       解码成功返回true，否则返回false
    * @note        None
    */
-  virtual bool decode(size_t len, const uint8_t *data) override;
+  virtual bool decode(size_t len, const uint8_t *data, uint32_t rx_id) override;
 
   /**
    * @brief       是否有更新数据
@@ -223,7 +222,6 @@ public:
    * @note        None
    */
   virtual uint32_t txId(void) const override { return tx_id_; };
-  virtual const TxIds &txIds(void) const override { return tx_ids_; };
 
   /**
    * @brief       编码
@@ -276,7 +274,6 @@ private:
   uint32_t tx_id_ = 0x03;             ///< 发送的CAN消息ID
   uint32_t transmit_success_cnt_ = 0; ///< 发送成功次数
   RxIds rx_ids_ = {rx_id_};           ///< 接收器ID列表
-  TxIds tx_ids_ = {tx_id_};           ///< 发送器ID列表
 
   // 所有数据
   MainBoardData main_board_data_;
